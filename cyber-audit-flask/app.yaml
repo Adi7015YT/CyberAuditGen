@@ -1,10 +1,19 @@
-runtime: python311
+runtime: python311  # Specify the Python version
 
-instance_class: F2
+entrypoint: gunicorn -b :$PORT app:app  # Command to start your app
+
+instance_class: F2  # F2 is a small instance; adjust based on your needs
+
+automatic_scaling:
+  min_instances: 0  # Minimum number of instances to run
+  max_instances: 2  # Maximum number of instances to run
+
+health_check:
+  enable_health_check: True
+  check_interval_sec: 5
+  timeout_sec: 4
+  unhealthy_threshold: 2
+  healthy_threshold: 2
 
 env_variables:
-  ALLOYDB_CONNECTION_STRING: "your-alloydb-connection-string"
-
-handlers:
-- url: /.*
-  script: auto
+  GOOGLE_CLOUD_PROJECT: "code-7015"
