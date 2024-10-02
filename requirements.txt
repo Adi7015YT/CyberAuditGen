@@ -5,4 +5,5 @@ pdfplumber
 spacy
 sqlalchemy
 pgvector
-flask
+Flask
+google-cloud-aiplatform
