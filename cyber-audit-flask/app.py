@@ -9,7 +9,6 @@ load_dotenv()
 
 # Access the environment variables
 google_cloud_project = os.getenv('GOOGLE_CLOUD_PROJECT')
-google_application_credentials = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
 
 app = Flask(__name__)
 

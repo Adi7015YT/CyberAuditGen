@@ -7,3 +7,4 @@ sqlalchemy
 pgvector
 Flask
 google-cloud-aiplatform
+psycopg2
