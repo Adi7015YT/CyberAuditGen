@@ -1,11 +1,20 @@
 import os
 from flask import Flask, request, jsonify, render_template
 from google.cloud import aiplatform
+from google.cloud.aiplatform.gapic import PredictionServiceClient
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Access the environment variables
+google_cloud_project = os.getenv('GOOGLE_CLOUD_PROJECT')
+google_application_credentials = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
 
 app = Flask(__name__)
 
 # Initialize Vertex AI SDK
-aiplatform.init(project=os.getenv('GOOGLE_CLOUD_PROJECT_ID'))
+aiplatform.init(project=google_cloud_project)
 
 @app.route('/')
 def index():
@@ -18,34 +27,32 @@ def ask():
     return jsonify(response)
 
 def call_vertex_ai_agent(question):
-    # Replace these variables with your Vertex AI model details
-    project_id = os.getenv('GOOGLE_CLOUD_PROJECT_ID')
-    location = 'us-central1'  # or your specific location
-    endpoint_id = 'YOUR_ENDPOINT_ID'  # replace with your endpoint ID
+    project_id = google_cloud_project
+    location = 'us-central1'  # Modify this if your model is deployed in a different region
+    model_id = "text-bison@001"  # Specify your model's ID or name
 
-    # Initialize the endpoint client
+    # Initialize the Prediction Service Client
     client_options = {"api_endpoint": f"{location}-aiplatform.googleapis.com"}
-    client = aiplatform.gapic.PredictionServiceClient(client_options=client_options)
+    prediction_client = PredictionServiceClient(client_options=client_options)
 
-    # Set up the endpoint path
-    endpoint = client.endpoint_path(
-        project=project_id,
-        location=location,
-        endpoint=endpoint_id,
-    )
+    # Specify the model resource name
+    model_resource = f"projects/{project_id}/locations/{location}/publishers/google/models/{model_id}"
 
     # Create the prediction request
-    instances = [{"question": question}]
-    parameters = {}
+    instances = [{"content": question}]  # Make sure this matches your model's input format
+    parameters = {}  # Adjust parameters if your model requires specific parameters
 
-    response = client.predict(
-        endpoint=endpoint, instances=instances, parameters=parameters
+    # Make the prediction
+    response = prediction_client.predict(
+        endpoint=model_resource, instances=instances, parameters=parameters
     )
 
     # Process the response
     predictions = response.predictions
     if predictions:
-        return {"response": predictions[0]}
+        # Extract the generated text from the predictions
+        generated_text = predictions[0].get('content', 'No text generated')
+        return {"response": generated_text}
     else:
         return {"response": "No answer could be generated for the question."}
 
