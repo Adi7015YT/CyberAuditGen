@@ -2,15 +2,12 @@ import os
 from flask import Flask, request, jsonify, render_template
 from google.cloud import aiplatform
 from google.cloud.aiplatform.gapic import PredictionServiceClient
-from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
+app = Flask(__name__)
 
 # Access the environment variables
 google_cloud_project = os.getenv('GOOGLE_CLOUD_PROJECT')
-
-app = Flask(__name__)
+alloydb_connection_string = os.getenv('ALLOYDB_CONNECTION_STRING')
 
 # Initialize Vertex AI SDK
 aiplatform.init(project=google_cloud_project)
@@ -49,11 +46,9 @@ def call_vertex_ai_agent(question):
     # Process the response
     predictions = response.predictions
     if predictions:
-        # Extract the generated text from the predictions
-        generated_text = predictions[0].get('content', 'No text generated')
-        return {"response": generated_text}
+        return {"response": predictions[0].get('generated_text', 'No text generated')}  # Adjust based on the output format
     else:
         return {"response": "No answer could be generated for the question."}
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=8080)
