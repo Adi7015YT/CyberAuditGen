@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberAuditGen</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding: 20px;
+        }
+        #response {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CyberAuditGen - Ask a Question</h1>
+        <div class="form-group">
+            <label for="question">Question:</label>
+            <input type="text" id="question" class="form-control">
+        </div>
+        <button id="askButton" class="btn btn-primary">Ask</button>
+        <div id="response" class="alert alert-info" role="alert" style="display: none;"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#askButton').click(function() {
+                const question = $('#question').val();
+                if (question) {
+                    $.ajax({
+                        url: '/ask',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ question: question }),
+                        success: function(response) {
+                            $('#response').text(response.response).show();
+                        },
+                        error: function() {
+                            $('#response').text('Error processing your request').show();
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
