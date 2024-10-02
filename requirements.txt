@@ -1,0 +1,8 @@
+google-cloud-storage
+google-cloud-functions
+pymupdf
+pdfplumber
+spacy
+sqlalchemy
+pgvector
+flask
